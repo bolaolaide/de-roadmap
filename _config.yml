@@ -1,0 +1,12 @@
+title: Data Engineering Roadmap
+description: An opinionated path from complete beginner to senior data engineer. Built for the UK/EU market.
+theme: null
+
+# Prevent Jekyll from processing the HTML file
+# (we're serving it as-is, not as a Jekyll template)
+include:
+  - index.html
+
+exclude:
+  - README.md
+  - "*.md"
