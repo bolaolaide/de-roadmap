@@ -57,7 +57,3 @@ The roadmap is opinionated by design. It tells you what to learn, what to skip, 
 Spotted something wrong? Know a better tool for a phase? Open an issue or PR. The roadmap is opinionated but not closed to improvement — especially as the ecosystem evolves.
 
 ---
-
-## License
-
-MIT — do whatever you want with it. If you find it useful, a ⭐ is appreciated.
