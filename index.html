@@ -1,0 +1,308 @@
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font-sans); }
+.container { padding: 1rem 0; }
+.phase-nav { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 1.5rem; }
+.phase-btn {
+  font-size: 12px; font-weight: 500; padding: 5px 12px;
+  border-radius: 20px; border: 0.5px solid var(--color-border-secondary);
+  background: var(--color-background-secondary); color: var(--color-text-secondary);
+  cursor: pointer; transition: all .15s;
+}
+.phase-btn:hover { background: var(--color-background-tertiary); }
+.phase-btn.active {
+  background: var(--phase-color, var(--color-background-info));
+  color: var(--phase-text, var(--color-text-info));
+  border-color: transparent; font-weight: 500;
+}
+.phase-card {
+  border: 0.5px solid var(--color-border-tertiary);
+  border-radius: var(--border-radius-lg);
+  overflow: hidden;
+  display: none;
+}
+.phase-card.visible { display: block; }
+.phase-header {
+  padding: 1.25rem 1.5rem 1rem;
+  border-bottom: 0.5px solid var(--color-border-tertiary);
+}
+.phase-tag {
+  font-size: 11px; font-weight: 500; letter-spacing: .5px;
+  padding: 3px 10px; border-radius: 20px;
+  display: inline-block; margin-bottom: 8px;
+}
+.phase-header h2 { font-size: 18px; font-weight: 500; margin-bottom: 4px; color: var(--color-text-primary); }
+.phase-header .meta { font-size: 13px; color: var(--color-text-secondary); }
+.outcome-bar {
+  padding: .75rem 1.5rem;
+  background: var(--color-background-secondary);
+  border-bottom: 0.5px solid var(--color-border-tertiary);
+  font-size: 13px; color: var(--color-text-secondary);
+}
+.outcome-bar strong { color: var(--color-text-primary); font-weight: 500; }
+.phase-body { padding: 1.25rem 1.5rem; display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+@media (max-width: 560px) { .phase-body { grid-template-columns: 1fr; } }
+.section-title {
+  font-size: 11px; font-weight: 500; letter-spacing: .6px;
+  color: var(--color-text-tertiary); text-transform: uppercase; margin-bottom: .6rem;
+}
+.learn-list { list-style: none; }
+.learn-list li {
+  font-size: 13px; color: var(--color-text-secondary);
+  padding: 4px 0; border-bottom: 0.5px solid var(--color-border-tertiary);
+  display: flex; align-items: baseline; gap: 8px;
+}
+.learn-list li:last-child { border-bottom: none; }
+.learn-list li::before {
+  content: ''; width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0;
+  background: var(--phase-color, var(--color-text-tertiary));
+  margin-top: 6px;
+}
+.coach-note {
+  border-left: 2px solid var(--phase-color, var(--color-border-secondary));
+  padding: .5rem .75rem; font-size: 13px;
+  color: var(--color-text-secondary); border-radius: 0;
+  background: var(--color-background-secondary);
+  border-radius: 0 var(--border-radius-md) var(--border-radius-md) 0;
+  margin-bottom: .75rem;
+}
+.proj-card {
+  background: var(--color-background-secondary);
+  border: 0.5px solid var(--color-border-tertiary);
+  border-radius: var(--border-radius-md);
+  padding: .75rem 1rem; margin-bottom: .5rem;
+  font-size: 13px;
+}
+.proj-card .proj-title { font-weight: 500; color: var(--color-text-primary); margin-bottom: 4px; }
+.proj-card .proj-detail { color: var(--color-text-secondary); font-size: 12px; }
+.proj-card.hero {
+  border-left: 2px solid var(--phase-color, var(--color-border-secondary));
+}
+.good-list { list-style: none; }
+.good-list li { font-size: 13px; color: var(--color-text-secondary); padding: 3px 0; display: flex; gap: 8px; }
+.good-list li::before { content: '✓'; color: var(--color-text-success); font-size: 12px; flex-shrink: 0; margin-top: 2px; }
+.full-col { grid-column: 1 / -1; }
+.warn-tag {
+  font-size: 11px; font-weight: 500; padding: 2px 8px;
+  border-radius: 20px; background: var(--color-background-warning);
+  color: var(--color-text-warning); display: inline-block; margin-left: 6px; vertical-align: middle;
+}
+.info-tag {
+  font-size: 11px; font-weight: 500; padding: 2px 8px;
+  border-radius: 20px; background: var(--color-background-info);
+  color: var(--color-text-info); display: inline-block; margin-left: 6px; vertical-align: middle;
+}
+.expert-tag {
+  font-size: 11px; font-weight: 500; padding: 2px 8px;
+  border-radius: 20px; background: var(--color-background-success);
+  color: var(--color-text-success); display: inline-block; margin-left: 6px;
+}
+.progress-dots { display: flex; gap: 4px; align-items: center; margin-bottom: 6px; }
+.dot { width: 6px; height: 6px; border-radius: 50%; background: var(--color-border-secondary); }
+.dot.done { background: var(--phase-color, var(--color-text-secondary)); }
+</style>
+
+<div class="container">
+  <div class="phase-nav" id="nav"></div>
+  <div id="cards"></div>
+</div>
+
+<script>
+const PHASES = [
+  {
+    id: 0, label: 'Phase 1', title: 'Core Foundations',
+    period: 'Month 0–2', color: '#3B8BD4', textColor: '#fff',
+    tag: 'FOUNDATIONS', tagBg: '#E6F1FB', tagText: '#185FA5',
+    outcome: 'You write clean code, model data correctly, and query with confidence.',
+    coachNote: 'Data Modeling moves here from later phases — you can\'t build a house without a blueprint. Docker moves to Phase 2.',
+    learn: [
+      'Python (clean, modular, OOP)',
+      'SQL: CTEs, joins, aggregations, window functions',
+      'Data modeling: ERDs, normalization vs denormalization',
+      'Star schema: fact & dimension tables',
+      'Git + GitHub (branching, PRs)',
+      'Linux (CLI, permissions, processes)'
+    ],
+    good: ['You debug scripts fast', 'You write efficient SQL without trial-and-error', 'You design a schema before writing a single query'],
+    projects: [
+      { title: 'Star Schema Builder', detail: 'Take a flat CSV (sales / Spotify / events). Design and build a star schema from scratch. Write 25+ SQL queries using CTEs.', hero: false },
+      { title: 'Analytics Dashboard', detail: 'Surface insights from your schema via a simple dashboard. The point is the model, not the viz.', hero: false }
+    ]
+  },
+  {
+    id: 1, label: 'Phase 2', title: 'Modern Infrastructure',
+    period: 'Month 2–3', color: '#7F77DD', textColor: '#fff',
+    tag: 'INFRA', tagBg: '#EEEDFE', tagText: '#534AB7',
+    outcome: 'You understand distributed thinking without getting stuck in the past.',
+    coachNote: 'The Big Data Trap: Hadoop is a legacy skill. Learn HDFS concepts, then move immediately to Object Storage (S3/ADLS) — that\'s the modern equivalent. Docker and Linux live here now.',
+    learn: [
+      'Docker (containers, images, compose)',
+      'HDFS concepts (conceptual, not operational)',
+      'Object storage: S3 and ADLS (the modern HDFS)',
+      'Distributed computing: partitioning, fault tolerance',
+      'Shuffling and network I/O — why moving compute to data wins',
+      'Hive: SQL on big data (legacy awareness)'
+    ],
+    good: ['You can explain why Spark replaced MapReduce', 'You understand how data is split across nodes', 'You run pipelines inside containers'],
+    projects: [
+      { title: 'Dockerized ETL', detail: 'Python ETL script running inside Docker. Reads raw data, outputs Parquet. No raw file paths — object-storage mindset.', hero: false },
+      { title: 'Distributed Concepts Demo', detail: 'Simulate a mini cluster with Docker. Run a Hive query on a large dataset to feel the pain that Spark solves.', hero: false }
+    ]
+  },
+  {
+    id: 2, label: 'Phase 3', title: 'Spark & Delta Lake',
+    period: 'Month 3–6', color: '#D85A30', textColor: '#fff',
+    tag: '🔥 MOST IMPORTANT', tagBg: '#FAECE7', tagText: '#993C1D',
+    outcome: 'You can build, optimize, and debug production-grade Spark pipelines.',
+    coachNote: 'You must learn to read the Spark UI. A senior engineer knows how to find bottlenecks in a DAG — not just write pipelines that happen to run.',
+    learn: [
+      'Spark DataFrames (main API — not RDDs)',
+      'Spark SQL and lazy evaluation / DAG',
+      'Spark UI: reading execution plans to find bottlenecks',
+      'Shuffle vs narrow transformations (critical concept)',
+      'Caching, persistence, partitioning strategies',
+      'Delta Lake: ACID transactions, time travel, schema evolution',
+      'Medallion architecture: Bronze → Silver → Gold',
+      'Databricks: notebooks, jobs, clusters, Unity Catalog, DABS',
+      'Change Data Capture (CDC) patterns'
+    ],
+    good: ['You optimize slow jobs by reading the Spark UI', 'You design Medallion pipelines without tutorials', 'You handle schema changes in production (CDC)'],
+    projects: [
+      { title: 'End-to-End Lakehouse System', detail: 'Bronze (raw ingestion) → Silver (cleaned + validated) → Gold (analytics tables). Include Delta Lake features, data quality checks, and performance tuning. This is career-defining.', hero: true }
+    ]
+  },
+  {
+    id: 3, label: 'Phase 4', title: 'Orchestration & Analytics Stack',
+    period: 'Month 6–9', color: '#1D9E75', textColor: '#fff',
+    tag: 'AUTOMATE IT', tagBg: '#E1F5EE', tagText: '#0F6E56',
+    outcome: 'Your pipelines run on autopilot — automated, fault-tolerant, and observable.',
+    coachNote: 'Kafka moves to Phase 6. Master batch pipelines first — streaming is Hard Mode. Key concept: idempotency. If your job runs twice, data must not double.',
+    learn: [
+      'Apache Airflow: DAGs, operators, scheduling',
+      'Idempotent pipeline design (runs twice = same result)',
+      'dbt: SQL-based transformations, tests, documentation',
+      'REST API ingestion patterns',
+      'CI/CD basics for data pipelines',
+      'Observability: logging, alerting, monitoring'
+    ],
+    good: ['Your pipelines are automated and self-healing', 'Your dbt models have tests and docs', 'A failed job restarts cleanly without duplicating data'],
+    projects: [
+      { title: 'Orchestrated Lakehouse Pipeline', detail: 'Airflow DAG → fetches from a REST API → saves to data lake → triggers a Databricks Spark job.', hero: false },
+      { title: 'dbt Transformation Layer', detail: 'Transform Silver → Gold using dbt. Add schema tests and auto-generated documentation.', hero: false }
+    ]
+  },
+  {
+    id: 4, label: 'Phase 5', title: 'Cloud Specialization',
+    period: 'Month 9–12', color: '#D85A30', textColor: '#fff',
+    tag: 'PICK ONE CLOUD', tagBg: '#FAECE7', tagText: '#993C1D',
+    outcome: 'You are job-ready for enterprise data roles in your chosen cloud ecosystem.',
+    coachNote: 'Do not learn Azure, AWS, and GCP simultaneously. Pick one horse and win the race. For UK/Europe: Azure. For startups/global tech: AWS. Security is what separates juniors from pros — master Managed Identities and Service Principals.',
+    learn: [
+      'Azure: ADLS, ADF, Azure Databricks, Synapse, Key Vault',
+      '— OR — AWS: S3, Glue, Redshift, Lambda, Step Functions',
+      'Managed Identities + Service Principals (security fundamentals)',
+      'Cost optimization: right-sizing clusters and storage tiers',
+      'Enterprise pipeline design: scheduling, monitoring, validation',
+      'Power BI / Tableau for Gold layer consumption'
+    ],
+    good: ['You design secure, cost-efficient enterprise pipelines', 'You know why IAM roles matter in production', 'You can estimate cloud costs before running a job'],
+    projects: [
+      { title: 'Full Enterprise Pipeline', detail: 'ADLS → ADF → Databricks → Synapse → Power BI (Azure path). Or S3 → Glue → Redshift → QuickSight (AWS path). Include scheduling, monitoring, and data validation.', hero: true }
+    ]
+  },
+  {
+    id: 5, label: 'Phase 6', title: 'Streaming & Real-Time',
+    period: 'Month 12–15', color: '#D4537E', textColor: '#fff',
+    tag: 'HARD MODE', tagBg: '#FBEAF0', tagText: '#993556',
+    outcome: 'You build low-latency pipelines and understand the tradeoffs vs batch.',
+    coachNote: 'Streaming is Hard Mode — that\'s why it\'s here, not in Month 2. You need to understand watermarking and late-arriving data before any of this makes sense.',
+    learn: [
+      'Apache Kafka (producers, consumers, topics, partitions)',
+      'Azure Event Hubs (managed Kafka equivalent)',
+      'Spark Structured Streaming',
+      'Watermarking and late-arriving data handling',
+      'Exactly-once vs at-least-once semantics',
+      'Near real-time dashboard patterns'
+    ],
+    good: ['You handle late data without corrupting aggregations', 'You explain exactly-once semantics clearly', 'You choose batch vs streaming based on business needs'],
+    projects: [
+      { title: 'Real-Time Pipeline', detail: 'Kafka → Spark Structured Streaming → storage → near real-time dashboard. Use live crypto prices or public event streams.', hero: true }
+    ]
+  },
+  {
+    id: 6, label: 'Expert+', title: 'Senior & Architect Differentiators',
+    period: 'Month 15+', color: '#639922', textColor: '#fff',
+    tag: 'ARCHITECT LEVEL', tagBg: '#EAF3DE', tagText: '#3B6D11',
+    outcome: 'You move from "developer who ships" to "engineer who designs systems."',
+    coachNote: 'These three pillars are what separate a £60K DE from a £100K+ architect. Anyone can run a £1,000 Spark job. An expert runs it for £10.',
+    learn: [
+      'Data Quality & Observability: Great Expectations, Monte Carlo',
+      'FinOps: right-sizing clusters, storage tiering, cost dashboards',
+      'CI/CD for data: GitHub Actions deploys Spark code + Airflow DAGs',
+      'Data mesh vs data warehouse architecture decisions',
+      'Multi-cloud strategy: Azure ↔ AWS migration patterns',
+      'CAP theorem, distributed systems design',
+      'System design case studies: Uber pricing, Spotify recommendation'
+    ],
+    good: ['A pipeline is useless if the data is wrong — you have quality gates', 'Your infrastructure deploys automatically on merge', 'You present cost trade-offs to stakeholders, not just technical specs'],
+    projects: [
+      { title: 'Data Quality Layer', detail: 'Add Great Expectations or similar to your existing Lakehouse. Define checks at Bronze, Silver, and Gold layers. Alert on failures.', hero: false },
+      { title: 'CI/CD Pipeline for Data', detail: 'GitHub Actions: on PR merge, run tests, deploy Spark code to Databricks, deploy Airflow DAGs. Zero manual steps.', hero: false },
+      { title: 'System Design Portfolio', detail: 'Write up two architecture case studies (e.g. Uber surge pricing pipeline, Spotify recommendations). Include cost estimates and trade-off analysis.', hero: false }
+    ]
+  }
+];
+
+const nav = document.getElementById('nav');
+const cards = document.getElementById('cards');
+
+PHASES.forEach((p, i) => {
+  const btn = document.createElement('button');
+  btn.className = 'phase-btn' + (i === 0 ? ' active' : '');
+  btn.textContent = p.label;
+  btn.style.setProperty('--phase-color', p.color);
+  btn.style.setProperty('--phase-text', p.textColor);
+  btn.onclick = () => show(i);
+  nav.appendChild(btn);
+
+  const card = document.createElement('div');
+  card.className = 'phase-card' + (i === 0 ? ' visible' : '');
+  card.style.setProperty('--phase-color', p.color);
+  card.innerHTML = `
+    <div class="phase-header">
+      <div class="progress-dots">${PHASES.map((_, j) => `<div class="dot${j <= i ? ' done' : ''}"></div>`).join('')}</div>
+      <span class="phase-tag" style="background:${p.tagBg};color:${p.tagText}">${p.tag}</span>
+      <h2>${p.title}</h2>
+      <div class="meta">${p.period}</div>
+    </div>
+    <div class="outcome-bar"><strong>Outcome:</strong> ${p.outcome}</div>
+    <div class="phase-body">
+      <div>
+        <div class="section-title">What to learn</div>
+        <ul class="learn-list">${p.learn.map(l => `<li>${l}</li>`).join('')}</ul>
+      </div>
+      <div>
+        <div class="section-title">Coach's note</div>
+        <div class="coach-note">${p.coachNote}</div>
+        <div class="section-title" style="margin-top:.75rem">What good looks like</div>
+        <ul class="good-list">${p.good.map(g => `<li>${g}</li>`).join('')}</ul>
+      </div>
+      <div class="full-col">
+        <div class="section-title">Portfolio projects</div>
+        ${p.projects.map(pr => `
+          <div class="proj-card${pr.hero ? ' hero' : ''}">
+            <div class="proj-title">${pr.hero ? '🔥 ' : ''}${pr.title}${pr.hero ? '<span class="warn-tag">Career-defining</span>' : ''}</div>
+            <div class="proj-detail">${pr.detail}</div>
+          </div>`).join('')}
+      </div>
+    </div>
+  `;
+  cards.appendChild(card);
+});
+
+function show(i) {
+  document.querySelectorAll('.phase-btn').forEach((b, j) => b.classList.toggle('active', j === i));
+  document.querySelectorAll('.phase-card').forEach((c, j) => c.classList.toggle('visible', j === i));
+}
+</script>
