@@ -3,7 +3,7 @@
 > An opinionated, structured path from complete beginner to senior data engineer.  
 > Built for the UK/EU job market. No fluff, no detours.
 
-🔗 **[View the live roadmap →](https://YOUR-USERNAME.github.io/data-engineering-roadmap)**
+🔗 **[View the live roadmap →](https://bolaolaide.github.io/de-roadmap)**
 
 ---
 
@@ -35,7 +35,7 @@ The roadmap is opinionated by design. It tells you what to learn, what to skip, 
 
 **Hadoop is treated as legacy.** You learn the concepts (HDFS, MapReduce) to understand *why* Spark exists — then move immediately to Object Storage (S3/ADLS), which is what you'll actually use.
 
-**Kafka is in Phase 6, not Phase 2.** Streaming is Hard Mode. Engineers who learn Kafka before they understand idempotent batch pipelines always struggle. Batch first, streaming second.
+**Kafka is in Phase 6.** Streaming is Hard Mode. Engineers who learn Kafka before they understand idempotent batch pipelines always struggle. Batch first, streaming second.
 
 **One cloud, not three.** Learning Azure, AWS, and GCP simultaneously leads to shallow knowledge in all three. Pick one, go deep. A second cloud takes weeks once you know one well — the concepts transfer.
 
@@ -49,30 +49,6 @@ The roadmap is opinionated by design. It tells you what to learn, what to skip, 
 2. Complete every portfolio project before moving to the next phase
 3. Read the "Coach's Note" in each phase — it explains *why* things are ordered this way
 4. Use the "What good looks like" section to self-assess before moving on
-
----
-
-## Running locally
-
-It's a single HTML file with no dependencies.
-
-```bash
-git clone https://github.com/YOUR-USERNAME/data-engineering-roadmap.git
-cd data-engineering-roadmap
-open index.html   # macOS
-# or: start index.html (Windows)
-# or: xdg-open index.html (Linux)
-```
-
----
-
-## Hosting on GitHub Pages
-
-1. Push this repo to GitHub
-2. Go to **Settings → Pages**
-3. Under **Source**, select `main` branch and `/ (root)` folder
-4. Click **Save**
-5. Your site will be live at `https://YOUR-USERNAME.github.io/data-engineering-roadmap` within a minute or two
 
 ---
 
